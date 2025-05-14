@@ -5,7 +5,7 @@
  * @format
  */
 
-import React from 'react';
+import React, {useState} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   ScrollView,
@@ -14,6 +14,9 @@ import {
   Text,
   useColorScheme,
   View,
+  TextInput,
+  TouchableOpacity,
+  Alert,
 } from 'react-native';
 
 import {
@@ -56,20 +59,34 @@ function Section({children, title}: SectionProps): React.JSX.Element {
 
 function App(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
+  const [numero, setNumero] = useState('');
+  const [monto, setMonto] = useState('');
+  const [mensaje, setMensaje] = useState('');
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+    flex: 1, // Make sure the view takes full screen height
   };
 
-  /*
-   * To keep the template simple and small we're adding padding to prevent view
-   * from rendering under the System UI.
-   * For bigger apps the recommendation is to use `react-native-safe-area-context`:
-   * https://github.com/AppAndFlow/react-native-safe-area-context
-   *
-   * You can read more about it here:
-   * https://github.com/react-native-community/discussions-and-proposals/discussions/827
-   */
+  const handleSubmit = () => {
+    // Basic validation
+    if (!numero.trim() || !monto.trim()) {
+      Alert.alert('Error', 'Por favor complete los campos requeridos');
+      return;
+    }
+
+    console.log('Formulario enviado:', {numero, monto, mensaje});
+    Alert.alert(
+      'Formulario Enviado',
+      `Número: ${numero}\nMonto: S/ ${monto}\nMensaje: ${mensaje}`,
+    );
+
+    // Reset form
+    setNumero('');
+    setMonto('');
+    setMensaje('');
+  };
+
   const safePadding = '5%';
 
   return (
@@ -79,30 +96,46 @@ function App(): React.JSX.Element {
         backgroundColor={backgroundStyle.backgroundColor}
       />
       <ScrollView
-        style={backgroundStyle}>
-        <View style={{paddingRight: safePadding}}>
-          <Header/>
-        </View>
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-            paddingHorizontal: safePadding,
-            paddingBottom: safePadding,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+        style={{backgroundColor: backgroundStyle.backgroundColor}}
+        contentContainerStyle={{flexGrow: 1, paddingBottom: 20}} // Add padding at bottom
+      >
+        <View style={{padding: safePadding}}>
+          <Text style={styles.formTitle}>Formulario de Ejemplo</Text>
+
+          <View style={styles.formContainer}>
+            <Text style={styles.label}>Número:</Text>
+            <TextInput
+              style={styles.input}
+              value={numero}
+              onChangeText={setNumero}
+              keyboardType="numeric"
+              placeholder="Ingrese un número"
+            />
+
+            <Text style={styles.label}>Monto S/:</Text>
+            <TextInput
+              style={styles.input}
+              value={monto}
+              onChangeText={setMonto}
+              keyboardType="decimal-pad"
+              placeholder="Ingrese el monto"
+            />
+
+            <Text style={styles.label}>Mensaje:</Text>
+            <TextInput
+              style={[styles.input, styles.messageInput]}
+              value={mensaje}
+              onChangeText={setMensaje}
+              placeholder="Escriba su mensaje"
+              multiline
+            />
+
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={handleSubmit}>
+              <Text style={styles.submitButtonText}>ENVIAR</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -125,6 +158,56 @@ const styles = StyleSheet.create({
   },
   highlight: {
     fontWeight: '700',
+  },
+  formTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginVertical: 16,
+    textAlign: 'center',
+    color: '#333',
+  },
+  formContainer: {
+    backgroundColor: '#f9f9f9',
+    borderRadius: 10,
+    padding: 20,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 5,
+    fontWeight: '500',
+    color: '#333',
+  },
+  input: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    padding: 10,
+    borderRadius: 5,
+    fontSize: 16,
+    marginBottom: 15,
+  },
+  messageInput: {
+    height: 80,
+    textAlignVertical: 'top',
+  },
+  submitButton: {
+    backgroundColor: '#2196F3',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
